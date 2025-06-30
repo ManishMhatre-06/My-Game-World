@@ -4,349 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Car Racing Game</title>
-  <style>
-    /* Define a CSS variable for topnav height for easy management */
-    :root {
-      --topnav-height: 60px;
-    }
-
-    /* Global styles for the body */
-    body {
-      margin: 0;
-      background: #000; /* Dark background */
-      display: flex; /* Use flexbox for main layout to arrange sidebar and content */
-      align-items: flex-start; /* Align content to the top initially, adjusts in media queries */
-      min-height: 100vh; /* Ensure body takes at least full viewport height */
-      font-family: 'Inter', sans-serif; /* Modern, clean font */
-      overflow-x: hidden; /* Prevent horizontal scrolling due to fixed elements */
-      position: relative; /* Needed for positioning fixed children relative to the viewport if they use percentages */
-      padding-top: var(--topnav-height); /* Push content down below the fixed topnav */
-    }
-
-    /* 🔝 Top Navigation Bar */
-    .topnav {
-      position: fixed;
-      width: 100%;
-      top: 0; /* Fixed to the top */
-      left: 0; /* Spans full width */
-      background: #7f00ff; /* Purple background from user's CSS */
-      color: #fff; /* White text color */
-      padding: 0.5rem 1rem; /* Adjusted padding to better fit 60px height */
-      height: var(--topnav-height); /* Explicit height for consistency */
-      box-sizing: border-box; /* Include padding in height */
-      z-index: 1000; /* Ensure it's on top of everything */
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-    }
-    .logo {
-      font-size: 1.4rem;
-      font-weight: bold;
-      padding-left: 10px; /* Add some padding for the logo */
-    }
-    .hamburger {
-      display: none; /* Hidden by default on larger screens */
-      font-size: 1.8rem; /* Slightly larger for touch */
-      cursor: pointer;
-      padding: 5px 10px; /* Padding for easier tapping */
-      border-radius: 5px; /* Rounded corners */
-      transition: background-color 0.3s ease;
-    }
-    .hamburger:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Sidebar Navigation Styles */
-    .sidebar {
-      width: 200px; /* Fixed width for the sidebar */
-      background-color: #222; /* Dark background for sidebar */
-      color: #fff; /* White text color */
-      padding: 20px 0; /* Vertical padding */
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
-      border-radius: 0 10px 10px 0; /* Rounded corners on the right side */
-      height: calc(100vh - var(--topnav-height)); /* Adjusted height to account for topnav */
-      position: fixed; /* Fixed position so it stays on screen */
-      left: 0; /* Aligned to the left */
-      top: var(--topnav-height); /* Positioned below the topnav */
-      z-index: 100; /* Ensure it's above other content */
-      transition: transform 0.3s ease, left 0.3s ease; /* Smooth transition for hiding/showing */
-    }
-
-    .sidebar nav ul {
-      list-style: none; /* Remove bullet points */
-      padding: 0; /* Remove default padding */
-      margin: 0; /* Remove default margin */
-    }
-
-    .sidebar nav ul li {
-      padding: 10px 20px; /* Padding for list items */
-      border-bottom: 1px solid #333; /* Separator line */
-    }
-
-    .sidebar nav ul li:last-child {
-      border-bottom: none; /* No border for the last item */
-    }
-
-    .sidebar nav ul li a {
-      color: #fff; /* White link color */
-      text-decoration: none; /* Remove underline */
-      display: block; /* Make the whole area clickable */
-      transition: background-color 0.3s ease; /* Smooth hover effect */
-      border-radius: 5px; /* Slightly rounded links */
-      padding: 5px; /* Internal padding for links */
-    }
-
-    .sidebar nav ul li.active a,
-    .sidebar nav ul li a:hover {
-      background-color: #555; /* Darker background on hover/active */
-    }
-
-    /* Main content area */
-    .main-content {
-        display: flex;
-        flex-direction: column; /* Stack game and bottom ad vertically */
-        align-items: center; /* Center items horizontally within main-content */
-        flex-grow: 1; /* Allow it to take available space */
-        margin-left: 200px; /* Offset to make space for the fixed sidebar */
-        margin-right: 200px; /* Margin for the right ad */
-        padding: 20px; /* Add some padding around the content */
-        box-sizing: border-box; /* Include padding in element's total width and height */
-        position: relative; /* For potential absolute positioning of children */
-        transition: margin-left 0.5s ease, margin-right 0.5s ease, padding 0.5s ease; /* Smooth transition for layout changes */
-        min-height: calc(100vh - var(--topnav-height) - 40px); /* Adjust min-height to account for topnav and vertical padding */
-        justify-content: center; /* Center game vertically if content is short */
-    }
-
-    /* Game container, holds the iframe and fullscreen button */
-    .game-container {
-      position: relative; /* Essential for positioning the fullscreen button inside */
-      width: 800px; /* Initial fixed width for the game */
-      height: 480px; /* Initial fixed height for the game */
-      background-color: #1a1a1a; /* Background for the game area */
-      border-radius: 10px; /* Rounded corners for the game container */
-      overflow: hidden; /* Ensures iframe content doesn't spill out */
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); /* Green glow effect for a gaming feel */
-      transition: all 0.5s ease; /* Smooth transition for size changes */
-      display: flex; /* Use flexbox to center the iframe within */
-      justify-content: center;
-      align-items: center;
-      z-index: 5; /* Ensure it's above some ads initially */
-    }
-
-    iframe {
-      border: none; /* No border for the iframe */
-      width: 100%; /* Iframe fills its container's width */
-      height: 100%; /* Iframe fills its container's height */
-      display: block; /* Removes extra space below the iframe */
-    }
-
-    /* Fullscreen Button Styles */
-    .fullscreen-button {
-      position: absolute; /* Position relative to .game-container */
-      top: 10px; /* 10px from the top */
-      right: 10px; /* 10px from the right */
-      background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
-      color: #fff; /* White text color */
-      border: 1px solid #0f0; /* Green border */
-      padding: 8px 12px; /* Padding inside the button */
-      border-radius: 8px; /* Rounded corners for the button */
-      cursor: pointer; /* Pointer cursor on hover */
-      font-size: 14px; /* Font size */
-      z-index: 10; /* Ensure button is on top of the iframe */
-      transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
-    }
-
-    .fullscreen-button:hover {
-      background-color: rgba(0, 0, 0, 0.9); /* Darker background on hover */
-      transform: scale(1.05); /* Slightly enlarge on hover */
-    }
-
-    /* Fullscreen Mode Styles (Applied to body when 'fullscreen' class is active) */
-    body.fullscreen .sidebar {
-        display: none; /* Completely hide sidebar and remove from layout flow */
-    }
-
-    body.fullscreen .main-content {
-        margin-left: 0; /* Remove all margins in fullscreen */
-        margin-right: 0; /* Remove all margins in fullscreen */
-        padding: 0; /* No padding in fullscreen */
-        justify-content: center; /* Center the game */
-        align-items: center; /* Center the game */
-        position: fixed; /* Fix it to fill the entire screen */
-        top: 0;
-        left: -15%;
-        width: 100vw; /* Full viewport width */
-        height: 100vh; /* Full viewport height */
-        z-index: 9999; /* Ensure it's on top of everything else */
-        background-color: rgba(0,0,0,0.9); /* Dark overlay behind the game */
-    }
-    /* Hide ads and topnav when in fullscreen mode */
-    body.fullscreen .ad-placeholder {
-        display: none; /* Completely hide ads */
-    }
-    body.fullscreen .topnav {
-        display: none; /* Hide topnav in fullscreen */
-    }
-
-    body.fullscreen .game-container {
-        width: 100vw; /* Container takes full viewport width */
-        height: 100vh; /* Container takes full viewport height */
-        border-radius: 0; /* No rounded corners in fullscreen */
-        box-shadow: none; /* No shadow in fullscreen */
-        /* Make the container a flex container to center the iframe */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* IMPORTANT: Style for iframe within fullscreen to maintain aspect ratio */
-    body.fullscreen .game-container iframe {
-        /* Make iframe attempt to fill 100% of its parent (game-container) */
-        width: 100%;
-        height: 100%;
-        /* Ensure it doesn't exceed its parent's width/height */
-        max-width: 100%;
-        max-height: 100%;
-        /* The key property to maintain aspect ratio */
-        object-fit: contain; /* Scales the content to fit within the container, preserving aspect ratio, adding black bars if needed */
-        /* Center the iframe within its flex container (game-container) */
-        display: block; /* Ensure it behaves as a block element within the flex container */
-        margin: auto; /* This is crucial for centering content that has an intrinsic aspect ratio when using object-fit: contain within a flex container. It distributes extra space around the iframe. */
-    }
-
-    /* AdSense Placeholders Styling */
-    .ad-placeholder {
-      background-color: #333; /* Dark background for ads */
-      color: #fff; /* White text */
-      display: flex; /* Use flexbox to center text inside */
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 14px;
-      border-radius: 8px; /* Rounded corners for ads */
-      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); /* Green glow effect */
-      padding: 10px; /* Internal padding */
-      box-sizing: border-box; /* Include padding in size */
-      flex-shrink: 0; /* Prevent shrinking when space is tight */
-      z-index: 6; /* Slightly above game initially, below fullscreen button */
-      flex-direction: column; /* Stack text vertically */
-      gap: 5px; /* Space between lines of text */
-    }
-
-    #right-ad-placeholder {
-      width: 160px; /* Standard skyscraper ad width */
-      height: 600px; /* Standard skyscraper ad height */
-      position: fixed; /* Fixed to the viewport */
-      right: 20px; /* 20px from the right edge */
-      top: 50%; /* Vertically center */
-      transform: translateY(-50%); /* Adjust for perfect vertical centering */
-      z-index: 10; /* Above sidebar, but will be covered by fullscreen game */
-    }
-
-    #bottom-ad-placeholder {
-      width: 728px; /* Standard leaderboard ad width */
-      height: 90px; /* Standard leaderboard ad height */
-      margin-top: 30px; /* Space between game and bottom ad */
-      /* This ad is part of the main-content flow, so no fixed positioning */
-      z-index: 5;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 1200px) {
-        /* Adjustments for medium screens (e.g., smaller desktops, large tablets) */
-        #right-ad-placeholder {
-            width: 120px; /* Smaller skyscraper */
-            height: 400px;
-            right: 10px;
-        }
-        .game-container {
-            width: 600px; /* Smaller game size */
-            height: 360px;
-        }
-        #bottom-ad-placeholder {
-            width: 468px; /* Smaller leaderboard */
-            height: 60px;
-        }
-        .main-content {
-            margin-right: 150px; /* Adjusted margin for smaller right ad */
-        }
-    }
-
-    @media (max-width: 900px) {
-        /* Adjustments for tablets and smaller screens */
-        body {
-            flex-direction: column; /* Stack sidebar and main content vertically */
-            align-items: stretch; /* Stretch to fill width */
-            padding-top: var(--topnav-height); /* Keep padding top for topnav */
-        }
-        /* Mobile-specific sidebar adjustments */
-        .sidebar {
-            width: 250px; /* Slightly wider for better content display */
-            height: calc(100vh - var(--topnav-height)); /* Still full height minus topnav */
-            position: fixed; /* Fixed for slide-out effect */
-            top: var(--topnav-height); /* Below topnav */
-            left: -250px; /* Hidden by default */
-            box-shadow: 5px 0 10px rgba(0,0,0,0.5); /* Shadow for slide-out */
-            border-radius: 0 10px 10px 0;
-            z-index: 200; /* Higher than main content to slide over it */
-            transition: left 0.3s ease; /* Smooth slide transition */
-            padding-top: 0; /* Remove top padding for mobile sidebar, adjusted for mobile */
-        }
-        .sidebar.open {
-            left: 0; /* Slide in when open */
-        }
-        .hamburger {
-            display: block; /* Show hamburger on smaller screens */
-        }
-        .main-content {
-            margin-left: 0; /* Remove sidebar offset for mobile, as sidebar slides over */
-            margin-right: 0; /* No right ad, so no margin needed */
-            padding: 10px;
-            align-items: center; /* Center content */
-            justify-content: flex-start; /* Stack content from the top */
-        }
-
-        #right-ad-placeholder {
-            display: none; /* Hide right ad on smaller screens to save space */
-        }
-        .game-container {
-            width: 100%; /* Game takes full available width */
-            max-width: 600px; /* Limit max width for better aesthetics on larger tablets */
-            height: calc(100vw * 9 / 16); /* Maintain aspect ratio (16:9) based on width */
-            max-height: 400px; /* Limit max height */
-        }
-        #bottom-ad-placeholder {
-            width: 320px; /* Mobile leaderboard size */
-            height: 50px;
-            margin-top: 20px;
-        }
-        /* Ensure fullscreen still works correctly */
-        body.fullscreen .sidebar {
-            display: none; /* Explicitly hide in fullscreen */
-        }
-        body.fullscreen .game-container {
-            width: 100vw;
-            height: 100vh;
-        }
-    }
-
-    @media (max-width: 600px) {
-        /* Further adjustments for very small screens (phones) */
-        .sidebar nav ul {
-            flex-direction: column; /* Stack sidebar links vertically */
-            align-items: center; /* Center links */
-        }
-        .sidebar nav ul li {
-            width: 100%; /* Links take full width */
-            text-align: center; /* Center text */
-        }
-        #bottom-ad-placeholder {
-            width: 300px; /* Slightly smaller for very narrow screens */
-            height: 50px;
-        }
-    }
-  </style>
+  <link rel="stylesheet" href="game.css">
 </head>
 <body>
   <header class="topnav">
@@ -373,7 +31,71 @@
     <div class="game-container" id="gameContainer">
       <button class="fullscreen-button" id="fullscreenButton">
         &#x2922; Fullscreen </button>
-      <iframe src="https://html5.gamemonetize.co/ghsqbsab3s37q5x2gk5k54w6shwl4i5f/" scrolling="none" frameborder="0"></iframe>
+      <iframe id="gameIframe" src="https://html5.gamemonetize.co/ghsqbsab3s37q5x2gk5k54w6shwl4i5f/" width="1920" height="1080" scrolling="none" frameborder="0" allowfullscreen="true"></iframe>
+    </div>
+
+    <div class="info-and-more-games-container">
+        <div class="game-info">
+          <h2>Game Description</h2>
+          <p>
+            Get ready for a frantic, feathery adventure in **Chicken Dash**! This arcade-style game challenges your reflexes and strategic thinking as you guide a plucky chicken through a series of increasingly chaotic levels. Avoid cunning predators, collect golden corn, and race against the clock to reach your cozy coop. With vibrant graphics and addictive gameplay, Chicken Dash is easy to pick up but hard to master!
+          </p>
+          <h2>How to Play</h2>
+          <p>
+            Mastering Chicken Dash is all about quick movements and smart choices.
+          </p>
+          <ul>
+            <li><strong>Movement:</strong> Use the **Arrow Keys** (Up, Down, Left, Right) or **WASD** (W for Up, A for Left, S for Down, D for Right) to control your chicken's direction.</li>
+            <li><strong>Objective:</strong> Navigate through the obstacles to collect all the shining **golden corn** in each level.</li>
+            <li><strong>Avoid Enemies:</strong> Watch out for hungry foxes, swooping hawks, and other farm hazards! Touching an enemy will result in losing a life.</li>
+            <li><strong>Time Limit:</strong> Each level has a time limit. Collect the corn and reach the **coop exit** before time runs out to proceed.</li>
+            <li><strong>Power-ups:</strong> Discover special power-ups like temporary speed boosts or shields to help you on your dash!</li>
+          </ul>
+          <p>Good luck, and happy dashing!</p>
+        </div>
+
+        <div class="more-games-section">
+            <h3>More Games You Might Like</h3>
+            <div class="more-games-grid">
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Runny+Rabbit" alt="Runny Rabbit Thumbnail">
+                    <div class="title">Runny Rabbit</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Farm+Escape" alt="Farm Escape Thumbnail">
+                    <div class="title">Farm Escape</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Cornfield+Chaos" alt="Cornfield Chaos Thumbnail">
+                    <div class="title">Cornfield Chaos</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Barnyard+Blast" alt="Barnyard Blast Thumbnail">
+                    <div class="title">Barnyard Blast</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Harvest+Hero" alt="Harvest Hero Thumbnail">
+                    <div class="title">Harvest Hero</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Poultry+Panic" alt="Poultry Panic Thumbnail">
+                    <div class="title">Poultry Panic</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Winged+Wonder" alt="Winged Wonder Thumbnail">
+                    <div class="title">Winged Wonder</div>
+                </a>
+                <a href="#" class="game-thumbnail">
+                    <img src="https://via.placeholder.com/160x100?text=Flap+Frenzy" alt="Flap Frenzy Thumbnail">
+                    <div class="title">Flap Frenzy</div>
+                </a>
+            </div>
+            <div class="more-games-button-container">
+                <a href="../index.html" class="more-games-button">
+                    More Games <span class="arrow-symbol">&rarr;</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="ad-placeholder" id="bottom-ad-placeholder">
@@ -387,82 +109,6 @@
     <p>Your Google AdSense Code Here</p>
   </div>
 
-  <script>
-    // Ensure the DOM is fully loaded before running script
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get references to the necessary DOM elements
-      const fullscreenButton = document.getElementById('fullscreenButton');
-      const gameContainer = document.getElementById('gameContainer');
-      const body = document.body;
-      const sidebar = document.getElementById('sidebar');
-      let isFullscreen = false; // State variable to track fullscreen status
-
-      // Function to toggle sidebar visibility (made global for onclick in HTML)
-      window.toggleSidebar = function() {
-        sidebar.classList.toggle('open');
-      };
-
-      // Add event listener to the fullscreen button
-      fullscreenButton.addEventListener('click', function() {
-        if (!isFullscreen) {
-          // If not in fullscreen, activate fullscreen mode
-          body.classList.add('fullscreen'); // Add 'fullscreen' class to body
-          fullscreenButton.innerHTML = '&#x2923; Exit Fullscreen'; // Change button text/icon
-          isFullscreen = true; // Update state
-        } else {
-          // If in fullscreen, exit fullscreen mode
-          body.classList.remove('fullscreen'); // Remove 'fullscreen' class from body
-          fullscreenButton.innerHTML = '&#x2922; Fullscreen'; // Revert button text/icon
-          isFullscreen = false; // Update state
-        }
-      });
-
-      // Optional: Add a keyboard listener to exit fullscreen when 'Escape' key is pressed
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && isFullscreen) {
-          // If Escape key is pressed and it's currently fullscreen, exit fullscreen
-          body.classList.remove('fullscreen'); // Remove 'fullscreen' class
-          fullscreenButton.innerHTML = '&#x2922; Fullscreen'; // Revert button text/icon
-          isFullscreen = false; // Update state
-        }
-      });
-
-      // Close sidebar if clicking outside when open (on mobile)
-      document.addEventListener('click', function(event) {
-          // Check if sidebar is open AND the click target is NOT the sidebar itself AND NOT the hamburger button
-          if (sidebar.classList.contains('open') &&
-              !sidebar.contains(event.target) &&
-              !event.target.classList.contains('hamburger') &&
-              !event.target.closest('.hamburger')) { /* Added closest for robustness */
-              sidebar.classList.remove('open');
-          }
-      });
-
-      // Adjust main content margin and sidebar visibility on initial load and resize for desktop vs mobile view
-      function adjustMainContentMargin() {
-          // Get the computed value of --topnav-height for dynamic calculations
-          const rootStyles = getComputedStyle(document.documentElement);
-          const topnavHeight = rootStyles.getPropertyValue('--topnav-height');
-
-          if (window.innerWidth > 900) { // Desktop view (or larger tablets)
-              document.querySelector('.main-content').style.marginLeft = '200px';
-              document.querySelector('.main-content').style.marginRight = '200px';
-              document.body.style.paddingTop = topnavHeight; // Ensure padding-top is correct
-              sidebar.style.left = '0'; // Ensure sidebar is visible on desktop
-              sidebar.classList.remove('open'); // Ensure sidebar isn't stuck "open" if resized from mobile to desktop
-              sidebar.style.transform = 'translateX(0)'; /* Ensure it's not hidden by old transform */
-          } else { // Mobile view (and smaller tablets)
-              document.querySelector('.main-content').style.marginLeft = '0';
-              document.querySelector('.main-content').style.marginRight = '0';
-              document.body.style.paddingTop = topnavHeight; // Keep padding top for topnav
-              sidebar.style.left = '-250px'; // Hide sidebar by default on mobile
-              // The `open` class handles `left: 0;` for sliding it in.
-          }
-      }
-
-      window.addEventListener('resize', adjustMainContentMargin);
-      adjustMainContentMargin(); // Call on initial load to set correct layout
-    });
-  </script>
+  <script src="game.js"></script>
 </body>
 </html>
